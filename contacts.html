@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alberta Constituent Briefing — Find Your MLA &amp; Minister</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#17212B;
+    --ink-soft:#26333F;
+    --paper:#F3F0E7;
+    --paper-dim:#EAE5D6;
+    --gold:#B8862E;
+    --gold-soft:#D8B667;
+    --rust:#9C4A32;
+    --line:#D8D2C2;
+    --slate:#5B6472;
+    --white:#FFFFFF;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-soft);color:var(--ink);}
+
+  a{color:var(--rust);}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--rust);
+    outline-offset:2px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    background:var(--ink);
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+    border-bottom:4px solid var(--gold);
+  }
+  .colonnade{
+    position:absolute;
+    inset:0;
+    opacity:0.16;
+    background-image:repeating-linear-gradient(
+      90deg,
+      transparent 0px, transparent 34px,
+      var(--gold-soft) 34px, var(--gold-soft) 36px
+    );
+    pointer-events:none;
+  }
+  .masthead-inner{
+    position:relative;
+    max-width:920px;
+    margin:0 auto;
+    padding:44px 24px 32px;
+  }
+  .masthead-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin:0;
+  }
+  .step-indicator{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--paper);
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .step-indicator .step{
+    padding:4px 9px;
+    border:1px solid #4A5563;
+    border-radius:2px;
+    color:#9099A6;
+  }
+  .step-indicator .step.active{
+    border-color:var(--gold-soft);
+    color:var(--gold-soft);
+  }
+  .restart-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    padding:7px 12px;
+    border:1px solid var(--gold-soft);
+    background:transparent;
+    color:var(--gold-soft);
+    border-radius:var(--radius);
+    cursor:pointer;
+    flex:none;
+  }
+  .restart-btn:hover{
+    background:var(--gold-soft);
+    color:var(--ink);
+  }
+  .masthead h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4.4vw,44px);
+    line-height:1.08;
+    margin:0 0 12px;
+    max-width:14ch;
+  }
+  .masthead p{
+    max-width:56ch;
+    color:#D9D2BF;
+    font-size:15.5px;
+    margin:0;
+  }
+
+  /* ---------- Layout ---------- */
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:36px 24px 80px;
+  }
+  section{margin-bottom:40px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+    margin-bottom:20px;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    border-radius:50%;
+    width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:20px;
+    margin:0;
+  }
+  .section-sub{
+    font-size:13.5px;
+    color:var(--slate);
+    margin:-12px 0 20px 34px;
+  }
+
+  /* ---------- Card shell ---------- */
+  .panel{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+
+  /* ---------- Postal code form ---------- */
+  .lookup-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  input[type="text"]{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    padding:12px 14px;
+    border:1px solid #C7C0AC;
+    border-radius:var(--radius);
+    background:var(--paper);
+    color:var(--ink);
+    flex:1 1 200px;
+    min-width:0;
+    letter-spacing:0.04em;
+  }
+  input[type="text"]::placeholder{color:#9C9784;}
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:var(--radius);
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button:hover{background:var(--ink-soft);}
+  button:active{transform:translateY(1px);}
+  button.secondary{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid #C7C0AC;
+    font-weight:500;
+  }
+  button.secondary:hover{background:var(--paper-dim);}
+  button.small{padding:7px 12px;font-size:12.5px;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .status-line{
+    font-size:13px;
+    color:var(--slate);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .status-line.error{color:var(--rust);font-weight:500;}
+
+  /* ---------- MLA result card ---------- */
+  .mla-card{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    margin-top:18px;
+    padding-top:18px;
+    border-top:1px dashed var(--line);
+  }
+  .seal{
+    flex:none;
+    width:52px;height:52px;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:20px;
+    color:var(--gold);
+    background:var(--paper);
+  }
+  .mla-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 2px;
+  }
+  .mla-district{
+    font-size:13.5px;
+    color:var(--slate);
+    margin:0 0 10px;
+  }
+  .contact-line{
+    font-size:13.5px;
+    margin:2px 0;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .contact-line .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--slate);
+    min-width:64px;
+  }
+
+  /* ---------- Topic finder ---------- */
+  .topic-controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:4px;
+  }
+  select{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:11px 12px;
+    border:1px solid #C7C0AC;
+    border-radius:var(--radius);
+    background:var(--paper);
+    color:var(--ink);
+    flex:1 1 220px;
+  }
+  .or-divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--slate);
+    font-size:12px;
+    font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin:16px 0;
+  }
+  .or-divider::before,.or-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+
+  .min-results{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .min-card{
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--paper);
+  }
+  .min-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:16px;
+    margin:0 0 4px;
+  }
+  .min-meta{
+    font-size:12.5px;
+    color:var(--slate);
+    margin:0 0 8px;
+  }
+  .min-meta .stale-flag{
+    color:var(--rust);
+    font-weight:600;
+  }
+  .min-links{
+    font-size:13px;
+  }
+  .min-card-actions{
+    flex:none;
+  }
+
+  /* ---------- Your list ---------- */
+  .list-empty{
+    color:var(--slate);
+    font-size:14px;
+    font-style:italic;
+  }
+  .list-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .list-item:last-child{border-bottom:none;}
+  .list-item-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15.5px;
+    margin:0 0 2px;
+  }
+  .list-item-role{
+    font-size:12.5px;
+    color:var(--slate);
+    margin:0;
+  }
+  .list-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+
+  .footnote{
+    font-size:12px;
+    color:var(--slate);
+    border-top:1px solid var(--line);
+    margin-top:60px;
+    padding-top:18px;
+    max-width:70ch;
+  }
+  .footnote a{color:var(--slate);text-decoration-color:#C7C0AC;}
+
+  .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    padding:2px 6px;
+    border:1px solid var(--gold);
+    color:var(--gold);
+    border-radius:2px;
+    margin-right:6px;
+  }
+
+  @media (max-width:560px){
+    .mla-card{flex-direction:column;}
+    .min-card{flex-direction:column;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="colonnade" aria-hidden="true"></div>
+  <div class="masthead-inner">
+    <div class="masthead-top">
+      <p class="eyebrow">Constituent Briefing Tool — Alberta</p>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="step-indicator">
+          <a href="index.html" class="step" style="text-decoration:none;">1 · Write</a>
+          <span class="step active">2 · Contacts</span>
+        </div>
+        <button type="button" id="restart-app" class="restart-btn">↺ Restart</button>
+      </div>
+    </div>
+    <h1>Know who to write, before you write it.</h1>
+    <p>Look up your MLA by postal code, find the minister who owns your issue, and build a single contact list for both — ready to copy, save, or email alongside your <a href="index.html" style="color:var(--gold-soft);">letter</a>.</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. MLA lookup -->
+  <section id="mla-section">
+    <div class="section-head">
+      <span class="section-num">1</span>
+      <h2>Find your MLA</h2>
+    </div>
+    <p class="section-sub">Matched using Represent, Open North's open database of Canadian electoral boundaries.</p>
+
+    <div class="panel">
+      <form id="postal-form" class="lookup-row" autocomplete="off">
+        <input type="text" id="postal-input" placeholder="Postal code, e.g. T2P 3G3" maxlength="7" aria-label="Postal code">
+        <button type="submit" id="postal-submit">Find my MLA</button>
+      </form>
+      <p class="status-line" id="mla-status"></p>
+      <div id="mla-result"></div>
+    </div>
+  </section>
+
+  <!-- 2. Minister finder -->
+  <section id="minister-section">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>Find the relevant minister</h2>
+    </div>
+    <p class="section-sub">Pick a portfolio area, or search in your own words — matches against ministry titles and mandates.</p>
+
+    <div class="panel">
+      <div class="topic-controls">
+        <select id="topic-select" aria-label="Choose a topic">
+          <option value="">Choose a topic area…</option>
+        </select>
+      </div>
+      <div class="or-divider">or search</div>
+      <div class="lookup-row">
+        <input type="text" id="topic-search" placeholder="e.g. &quot;electricity bills&quot;, &quot;school funding&quot;, &quot;farm irrigation&quot;" aria-label="Search by topic">
+        <button type="button" id="topic-search-btn" class="secondary">Search</button>
+      </div>
+      <div class="min-results" id="min-results"></div>
+    </div>
+  </section>
+
+  <!-- 3. Your list -->
+  <section id="list-section">
+    <div class="section-head">
+      <span class="section-num">3</span>
+      <h2>Your list</h2>
+    </div>
+    <p class="section-sub">Everything you've added from steps 1 and 2, ready to take with you.</p>
+
+    <div class="panel">
+      <div id="my-list">
+        <p class="list-empty">Nothing added yet — find your MLA or a minister above, then add them here.</p>
+      </div>
+      <div class="list-actions">
+        <button type="button" class="secondary small" id="copy-list">Copy emails</button>
+        <button type="button" class="secondary small" id="download-list">Download emails (.txt)</button>
+        <button type="button" class="secondary small" id="clear-list">Clear list</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    MLA matches come from the <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener">Represent API</a> (Open North), which sources official electoral boundary and representative data — accuracy depends on their data refresh and, per their own documentation, postal codes occasionally straddle more than one district. Always confirm against <a href="https://www.elections.ab.ca/voters/members-of-the-legislative-assembly/" target="_blank" rel="noopener">Elections Alberta</a> for anything formal.
+    <br><br>
+    Ministry portfolios were last synced from <a href="https://www.alberta.ca/premier-cabinet" target="_blank" rel="noopener">alberta.ca/premier-cabinet</a> on <strong id="sync-date"></strong>. Minister emails are role-based addresses (e.g. <code>fp.minister@gov.ab.ca</code>) verified directly against the Government of Alberta staff directory, and should keep working across a cabinet reshuffle since they belong to the office, not the person — the name shown for each portfolio is the one exception that can still drift out of date between syncs. See the code comment near <code>MINISTRIES</code> for how to re-sync.
+  </p>
+
+</main>
+
+<script>
+/* =========================================================================
+   MINISTRIES DATA
+   ------------------------------------------------------------------------
+   This is the part that needs periodic upkeep. Cabinet shuffles happen a
+   few times a year. To refresh:
+     1. Open https://www.alberta.ca/premier-cabinet
+     2. For each minister card, note the portfolio TITLE and the "Learn
+        more" link's URL slug (the part after alberta.ca/).
+     3. Update `title`, `slug`, and `lastKnownMinister` below. Leave
+        `keywords` alone unless the portfolio's actual mandate changed.
+     4. Update SYNC_DATE.
+   `lastKnownMinister` is shown with a stale-data disclaimer and is
+   secondary to the live link — never treat it as ground truth in code.
+
+   `email` is a ROLE-based address (e.g. fp.Minister@gov.ab.ca), not a
+   personal one — unlike lastKnownMinister, it should survive a cabinet
+   reshuffle without going stale, as long as the portfolio itself isn't
+   renamed or split. Still worth spot-checking occasionally. Verified
+   role addresses can be cross-referenced against the Government of
+   Alberta staff directory search (Members of Executive Council, under
+   the Name column) — note that page's robots.txt blocks automated
+   fetching, so this has to be done by hand in a browser, not scraped.
+   Entries with an empty string haven't been verified yet — the app
+   falls back to the alberta.ca profile link for those.
+   ========================================================================= */
+  const SYNC_DATE = "2026-07-27";
+
+  const MINISTRIES = [
+    { title:"Premier &amp; Intergovernmental and International Relations", slug:"premier", lastKnownMinister:"Danielle Smith", email:"Premier@gov.ab.ca",
+      keywords:["premier","intergovernmental","federal relations","international relations","referendum","sovereignty","constitution"] },
+    { title:"Public Safety and Emergency Services", slug:"minister-of-public-safety-and-emergency-services", lastKnownMinister:"Mike Ellis", email:"PSES.minister@gov.ab.ca",
+      keywords:["public safety","police","policing","emergency","wildfire response","disaster","911","crime"] },
+    { title:"Treasury Board and Finance", slug:"minister-of-treasury-board-and-finance", lastKnownMinister:"Jason Nixon", email:"tbf.minister@gov.ab.ca",
+      keywords:["finance","budget","taxes","treasury","spending","deficit","surplus","provincial debt"] },
+    { title:"Affordability and Utilities", slug:"minister-of-affordability-and-utilities", lastKnownMinister:"RJ Sigurdson", email:"au.minister@gov.ab.ca",
+      keywords:["affordability","utilities","electricity bills","natural gas bills","power prices","cost of living"] },
+    { title:"Justice", slug:"minister-of-justice", lastKnownMinister:"Mickey Amery", email:"ministryofjustice@gov.ab.ca",
+      keywords:["justice","courts","law","legal aid","attorney general","prosecutions","elections act"] },
+    { title:"Tourism and Sport", slug:"minister-of-tourism-and-sport", lastKnownMinister:"Andrew Boitchenko", email:"ts.minister@gov.ab.ca",
+      keywords:["tourism","sport","recreation","hospitality industry","events"] },
+    { title:"Transportation and Economic Corridors", slug:"minister-of-transportation-and-economic-corridors", lastKnownMinister:"Devin Dreeshen", email:"transportation.minister@gov.ab.ca",
+      keywords:["transportation","highways","roads","rail","pipelines corridor","economic corridors","traffic"] },
+    { title:"Arts, Culture and Status of Women", slug:"minister-of-arts-culture-and-status-of-women", lastKnownMinister:"Tanya Fir", email:"acsw.minister@gov.ab.ca",
+      keywords:["arts","culture","status of women","gender equity","heritage","museums","libraries"] },
+    { title:"Technology and Innovation", slug:"minister-of-technology-and-innovation", lastKnownMinister:"Nate Glubish", email:"ti.minister@gov.ab.ca",
+      keywords:["technology","innovation","ai","artificial intelligence","digital government","data","privacy tech"] },
+    { title:"Environment and Protected Areas", slug:"minister-of-environment-and-protected-areas", lastKnownMinister:"Grant Hunter", email:"epa.minister@gov.ab.ca",
+      keywords:["environment","climate","protected areas","conservation","emissions","water quality","pollution"] },
+    { title:"Energy and Minerals", slug:"minister-of-energy-and-minerals", lastKnownMinister:"Brian Jean", email:"minister.energy@gov.ab.ca",
+      keywords:["energy","oil","gas","minerals","mining","pipelines","renewables","electricity generation"] },
+    { title:"Hospital and Surgical Health Services", slug:"minister-of-hospital-and-surgical-health-services", lastKnownMinister:"Adriana LaGrange", email:"HSHS.Minister@gov.ab.ca",
+      keywords:["hospitals","surgery","surgical wait times","emergency rooms","acute care"] },
+    { title:"Primary and Preventative Health Services", slug:"minister-of-primary-and-preventative-health-services", lastKnownMinister:"Justin Wright", email:"PPHS.minister@gov.ab.ca",
+      keywords:["primary care","family doctor","preventative health","public health","vaccines","clinics"] },
+    { title:"Forestry and Parks", slug:"minister-of-forestry-and-parks", lastKnownMinister:"Todd Loewen", email:"fp.Minister@gov.ab.ca",
+      keywords:["forestry","parks","provincial parks","wildfire prevention","logging","campgrounds"] },
+    { title:"Infrastructure", slug:"minister-of-infrastructure", lastKnownMinister:"Martin Long", email:"infrastructure.minister@gov.ab.ca",
+      keywords:["infrastructure","schools construction","hospitals construction","public buildings","capital projects"] },
+    { title:"Advanced Education", slug:"minister-of-advanced-education", lastKnownMinister:"Myles McDougall", email:"ae.minister@gov.ab.ca",
+      keywords:["advanced education","university","college","post-secondary","tuition","student aid"] },
+    { title:"Service Alberta and Red Tape Reduction", slug:"minister-of-service-alberta-and-red-tape-reduction", lastKnownMinister:"Dale Nally", email:"ministersa@gov.ab.ca",
+      keywords:["service alberta","red tape","registries","consumer protection","government services"] },
+    { title:"Education and Childcare", slug:"minister-of-education-and-childcare", lastKnownMinister:"Demetrios Nicolaides", email:"education.minister@gov.ab.ca",
+      keywords:["education","k-12","schools","childcare","daycare","curriculum","teachers"] },
+    { title:"Assisted Living and Social Services", slug:"minister-of-assisted-living-and-social-services", lastKnownMinister:"Nathan Neudorf", email:"ALSS.Minister@gov.ab.ca",
+      keywords:["assisted living","seniors housing","disability supports","aish","social services","income support"] },
+    { title:"Indigenous Relations", slug:"minister-of-indigenous-relations", lastKnownMinister:"Rajan Sawhney", email:"ir.ministeroffice@gov.ab.ca",
+      keywords:["indigenous relations","first nations","metis","treaty","reconciliation"] },
+    { title:"Jobs, Economy, Trade and Immigration", slug:"minister-of-jobs-economy-trade-and-immigration", lastKnownMinister:"Joseph Schow", email:"Jeti.minister@gov.ab.ca",
+      keywords:["jobs","economy","trade","immigration","labour market","workforce","business investment"] },
+    { title:"Agriculture and Irrigation", slug:"minister-of-agriculture-and-irrigation", lastKnownMinister:"Tara Sawyer", email:"AGRIC.Minister@gov.ab.ca",
+      keywords:["agriculture","farming","irrigation","ranching","crops","livestock","rural water"] },
+    { title:"Children and Family Services", slug:"minister-of-children-and-family-services", lastKnownMinister:"Searle Turton", email:"cfs.minister@gov.ab.ca",
+      keywords:["children","family services","child welfare","foster care","adoption"] },
+    { title:"Municipal Affairs", slug:"minister-of-municipal-affairs", lastKnownMinister:"Dan Williams", email:"minister.municipalaffairs@gov.ab.ca",
+      keywords:["municipal affairs","cities","towns","local government","municipal funding","land use"] },
+    { title:"Mental Health and Addiction", slug:"minister-of-mental-health-and-addiction", lastKnownMinister:"Rick Wilson", email:"mha.minister@gov.ab.ca",
+      keywords:["mental health","addiction","recovery","opioids","counselling","treatment centres"] },
+    { title:"Associate Minister of Multiculturalism", slug:"associate-minister-of-multiculturalism", lastKnownMinister:"Muhammad Yaseen", email:"AssociateMinister-MC@gov.ab.ca",
+      keywords:["multiculturalism","newcomers","diversity","settlement services"] },
+  ];
+
+  const BASE_URL = "https://www.alberta.ca/";
+
+  // Populate topic dropdown (sorted alphabetically by title for scanning)
+  const topicSelect = document.getElementById('topic-select');
+  [...MINISTRIES]
+    .sort((a,b)=>a.title.localeCompare(b.title))
+    .forEach(m=>{
+      const opt = document.createElement('option');
+      opt.value = m.slug;
+      opt.textContent = m.title.replace(/&amp;/g,'&');
+      topicSelect.appendChild(opt);
+    });
+
+  document.getElementById('sync-date').textContent = SYNC_DATE;
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+  let myList = []; // { type:'mla'|'minister', name, role, email, id }
+
+  function renderList(){
+    const container = document.getElementById('my-list');
+    if(myList.length === 0){
+      container.innerHTML = '<p class="list-empty">Nothing added yet — find your MLA or a minister above, then add them here.</p>';
+      return;
+    }
+    container.innerHTML = '';
+    myList.forEach(item=>{
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      row.innerHTML = `
+        <div>
+          <p class="list-item-name">${escapeHtml(item.name)}</p>
+          <p class="list-item-role">${escapeHtml(item.role)}</p>
+        </div>
+        <button type="button" class="secondary small remove-item" data-id="${item.id}">Remove</button>
+      `;
+      container.appendChild(row);
+    });
+    container.querySelectorAll('.remove-item').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        myList = myList.filter(i=>i.id !== btn.dataset.id);
+        renderList();
+      });
+    });
+  }
+
+  function addToList(item){
+    if(myList.some(i=>i.id === item.id)) return;
+    myList.push(item);
+    renderList();
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+/* =========================================================================
+   MLA LOOKUP (Represent API)
+   ========================================================================= */
+  const postalForm = document.getElementById('postal-form');
+  const postalInput = document.getElementById('postal-input');
+  const mlaStatus = document.getElementById('mla-status');
+  const mlaResult = document.getElementById('mla-result');
+  const postalSubmit = document.getElementById('postal-submit');
+
+  postalForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const raw = postalInput.value.trim().toUpperCase().replace(/\s+/g,'');
+    if(!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(raw)){
+      mlaStatus.textContent = "That doesn't look like a valid Canadian postal code (format A1A 1A1).";
+      mlaStatus.classList.add('error');
+      return;
+    }
+    mlaStatus.classList.remove('error');
+    mlaStatus.textContent = "Looking up your riding…";
+    mlaResult.innerHTML = '';
+    postalSubmit.disabled = true;
+
+    try {
+      const res = await fetch(`https://represent.opennorth.ca/postcodes/${raw}/`);
+      if(!res.ok){
+        throw new Error(res.status === 404 ? "No match found for that postal code." : `Lookup failed (status ${res.status}).`);
+      }
+      const data = await res.json();
+      // Represent often returns matches in `representatives_centroid` with
+      // `representatives_concordance` present but empty — an empty array is
+      // still truthy in JS, so `||` alone silently drops real results.
+      // Merge both and dedupe by URL/name instead of picking just one.
+      const centroid = data.representatives_centroid || [];
+      const concordance = data.representatives_concordance || [];
+      const seen = new Set();
+      const reps = [...centroid, ...concordance].filter(r=>{
+        const key = r.url || r.name;
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      const mlaReps = reps.filter(r =>
+        (r.elected_office || '').toUpperCase() === 'MLA' ||
+        (r.representative_set_name || '').toLowerCase().includes('legislative assembly of alberta')
+      );
+
+      if(mlaReps.length === 0){
+        mlaStatus.textContent = "Found the postal code, but no MLA record came back from Represent — try Elections Alberta's lookup directly (linked below).";
+        return;
+      }
+
+      mlaStatus.textContent = mlaReps.length > 1
+        ? "This postal code straddles more than one riding — showing all matches."
+        : "Match found.";
+
+      mlaResult.innerHTML = '';
+      mlaReps.forEach(rep=>{
+        const initials = (rep.name || '?').split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+        const card = document.createElement('div');
+        card.className = 'mla-card';
+        card.innerHTML = `
+          <div class="seal">${escapeHtml(initials)}</div>
+          <div style="flex:1;">
+            <p class="mla-name">${escapeHtml(rep.name || 'Unknown')}</p>
+            <p class="mla-district">${escapeHtml(rep.district_name || '')}${rep.party_name ? ' · ' + escapeHtml(rep.party_name) : ''}</p>
+            ${rep.email ? `<p class="contact-line"><span class="label">Email</span> <a href="mailto:${escapeHtml(rep.email)}">${escapeHtml(rep.email)}</a></p>` : ''}
+            ${rep.personal_url ? `<p class="contact-line"><span class="label">Profile</span> <a href="${escapeHtml(rep.personal_url)}" target="_blank" rel="noopener">${escapeHtml(rep.personal_url)}</a></p>` : ''}
+            ${(rep.offices||[]).map(o=>`<p class="contact-line"><span class="label">${escapeHtml(o.type||'Office')}</span> ${escapeHtml(o.tel||'')} ${escapeHtml(o.postal||'')}</p>`).join('')}
+            <div style="margin-top:12px;">
+              <button type="button" class="secondary small add-mla">Add to my list</button>
+            </div>
+          </div>
+        `;
+        mlaResult.appendChild(card);
+        card.querySelector('.add-mla').addEventListener('click', ()=>{
+          addToList({
+            id: 'mla-' + (rep.url || rep.name),
+            type: 'mla',
+            name: rep.name || 'Unknown MLA',
+            role: `MLA — ${rep.district_name || 'Alberta'}${rep.email ? ' — ' + rep.email : ''}`,
+            email: rep.email || ''
+          });
+        });
+      });
+
+    } catch(err){
+      console.error('MLA lookup failed:', err);
+      mlaStatus.classList.add('error');
+      const isNetworkError = err instanceof TypeError;
+      mlaStatus.textContent = isNetworkError
+        ? "Couldn't reach the Represent API — if you opened this file directly (file:// in the address bar), your browser is likely blocking the request. Serve it from a local server or your deployed site instead. See console for details."
+        : (err.message || "Something went wrong reaching the Represent API. Try again shortly, or use Elections Alberta's lookup directly.");
+    } finally {
+      postalSubmit.disabled = false;
+    }
+  });
+
+/* =========================================================================
+   MINISTER FINDER
+   ========================================================================= */
+  function renderMinisterResults(matches){
+    const container = document.getElementById('min-results');
+    container.innerHTML = '';
+    if(matches.length === 0){
+      container.innerHTML = '<p class="list-empty">No portfolio matched that search — try a broader term, or browse the dropdown above.</p>';
+      return;
+    }
+    matches.forEach(m=>{
+      const url = BASE_URL + m.slug;
+      const card = document.createElement('div');
+      card.className = 'min-card';
+      card.innerHTML = `
+        <div>
+          <p class="min-title">${m.title}</p>
+          <p class="min-meta">Last known minister: ${escapeHtml(m.lastKnownMinister)}${m.email ? '' : ' <span class="stale-flag">(verify — cabinet changes without much notice)</span>'}</p>
+          ${m.email
+            ? `<p class="contact-line"><span class="label">Email</span> <a href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a> <span style="color:var(--slate);font-size:11.5px;">(role-based — survives a reshuffle)</span></p>`
+            : ''
+          }
+          <p class="min-links"><a href="${url}" target="_blank" rel="noopener">View current minister &amp; contact info on alberta.ca →</a></p>
+        </div>
+        <div class="min-card-actions">
+          <button type="button" class="secondary small add-min">Add to my list</button>
+        </div>
+      `;
+      container.appendChild(card);
+      card.querySelector('.add-min').addEventListener('click', ()=>{
+        addToList({
+          id: 'min-' + m.slug,
+          type: 'minister',
+          name: m.title.replace(/&amp;/g,'&'),
+          role: m.email
+            ? `Minister — role-based address, survives reshuffle — ${url}`
+            : `Minister (as of last sync: ${m.lastKnownMinister}) — ${url}`,
+          email: m.email || ''
+        });
+      });
+    });
+  }
+
+  topicSelect.addEventListener('change', ()=>{
+    if(!topicSelect.value) return;
+    const m = MINISTRIES.find(x=>x.slug === topicSelect.value);
+    renderMinisterResults(m ? [m] : []);
+    document.getElementById('topic-search').value = '';
+  });
+
+  function runTopicSearch(){
+    const q = document.getElementById('topic-search').value.trim().toLowerCase();
+    if(!q) return;
+    topicSelect.value = '';
+    const matches = MINISTRIES.filter(m=>{
+      const hay = (m.title + ' ' + m.keywords.join(' ')).toLowerCase();
+      return q.split(/\s+/).some(word => word.length > 2 && hay.includes(word));
+    });
+    renderMinisterResults(matches);
+  }
+  document.getElementById('topic-search-btn').addEventListener('click', runTopicSearch);
+  document.getElementById('topic-search').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); runTopicSearch(); }
+  });
+
+/* =========================================================================
+   LIST ACTIONS
+   ========================================================================= */
+  function emailEntries(){
+    const withEmail = myList.filter(i=>i.email);
+    const withoutEmail = myList.filter(i=>!i.email);
+    return { withEmail, withoutEmail };
+  }
+
+  function listAsText(){
+    if(myList.length === 0) return '';
+    const { withEmail, withoutEmail } = emailEntries();
+    const lines = [];
+    withEmail.forEach(i=>lines.push(i.email));
+    if(withoutEmail.length){
+      lines.push("");
+      lines.push("No email on file (open their alberta.ca page from the list above):");
+      withoutEmail.forEach(i=>lines.push(`- ${i.name}`));
+    }
+    return lines.join("\n");
+  }
+
+  function emailsForClipboard(){
+    const { withEmail } = emailEntries();
+    return withEmail.map(i=>i.email).join(", ");
+  }
+
+  document.getElementById('copy-list').addEventListener('click', async ()=>{
+    if(myList.length === 0) return;
+    const { withEmail, withoutEmail } = emailEntries();
+    const text = emailsForClipboard();
+    if(!text){
+      alert("None of the items in your list have a known email address yet — see the alberta.ca links for those.");
+      return;
+    }
+    try{
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copy-list');
+      const original = btn.textContent;
+      btn.textContent = withoutEmail.length ? `Copied ✓ (${withoutEmail.length} without email)` : "Copied ✓";
+      setTimeout(()=>btn.textContent = original, 2000);
+    }catch{
+      alert("Couldn't copy automatically — select and copy the list manually.");
+    }
+  });
+
+  document.getElementById('download-list').addEventListener('click', ()=>{
+    const text = listAsText();
+    if(!text) return;
+    const blob = new Blob([text], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'alberta-contact-list.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('clear-list').addEventListener('click', ()=>{
+    if(myList.length === 0) return;
+    if(confirm("Clear everything from your list?")){
+      myList = [];
+      renderList();
+    }
+  });
+
+  document.getElementById('restart-app').addEventListener('click', ()=>{
+    const hasContent = myList.length > 0 || postalInput.value || topicSelect.value || document.getElementById('topic-search').value;
+    if(hasContent && !confirm("Restart the app? This clears your postal code, minister search, and your saved list.")){
+      return;
+    }
+    postalInput.value = '';
+    mlaStatus.textContent = '';
+    mlaStatus.classList.remove('error');
+    mlaResult.innerHTML = '';
+    topicSelect.value = '';
+    document.getElementById('topic-search').value = '';
+    document.getElementById('min-results').innerHTML = '';
+    myList = [];
+    renderList();
+  });
+
+  renderList();
+</script>
+</body>
+</html>

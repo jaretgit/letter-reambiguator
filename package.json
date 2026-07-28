@@ -1,0 +1,9 @@
+{
+  "name": "alberta-constituent-briefing",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Alberta MLA/minister contact tool + letter paraphraser",
+  "engines": {
+    "node": ">=18"
+  }
+}

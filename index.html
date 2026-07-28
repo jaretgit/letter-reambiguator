@@ -320,7 +320,8 @@
       <p class="eyebrow">Constituent Briefing Tool — Alberta</p>
       <div class="step-indicator">
         <span class="step active">1 · Write</span>
-        <span class="step">2 · Contacts</span>
+        <a href="contacts.html" class="step" style="text-decoration:none;">2 · Contacts</a>
+        <a href="review.html" class="step" style="text-decoration:none;">3 · Review</a>
       </div>
     </div>
     <h1>Make it yours before you send it.</h1>
@@ -371,15 +372,15 @@
         <p class="result-label">Your letter</p>
         <p class="result-text" id="result-text"></p>
         <div class="result-actions">
-          <button type="button" class="secondary small" id="copy-result">Copy text</button>
           <button type="button" class="secondary small" id="regenerate">Regenerate (new variation)</button>
         </div>
+        <p style="font-size:12.5px;color:var(--slate);margin:10px 0 0;">Saved for the review page — no need to copy it here.</p>
       </div>
     </div>
   </section>
 
   <div class="continue-bar">
-    <p>Next, find your MLA and the minister for this topic — their emails are ready to copy alongside your letter.</p>
+    <p>Next, find your MLA and the minister for this topic. Everything comes together for copying on the review page after that.</p>
     <a href="contacts.html" class="continue-link">Find contacts →</a>
   </div>
 
@@ -398,7 +399,6 @@
   const statusLine = document.getElementById('rewrite-status');
   const resultPanel = document.getElementById('result-panel');
   const resultText = document.getElementById('result-text');
-  const copyBtn = document.getElementById('copy-result');
   const regenerateBtn = document.getElementById('regenerate');
   const templateCount = document.getElementById('template-count');
   const personalizationCount = document.getElementById('personalization-count');
@@ -450,6 +450,12 @@
       resultText.textContent = data.text;
       resultPanel.classList.add('visible');
       statusLine.textContent = '';
+
+      try{
+        sessionStorage.setItem('abLetter', JSON.stringify({ text: data.text, savedAt: Date.now() }));
+      }catch(storageErr){
+        console.warn('Could not save letter to sessionStorage:', storageErr);
+      }
     } catch(err){
       console.error('Paraphrase request failed:', err);
       statusLine.classList.add('error');
@@ -470,16 +476,6 @@
 
   regenerateBtn.addEventListener('click', runRewrite);
 
-  copyBtn.addEventListener('click', async ()=>{
-    try{
-      await navigator.clipboard.writeText(resultText.textContent);
-      const original = copyBtn.textContent;
-      copyBtn.textContent = "Copied ✓";
-      setTimeout(()=>copyBtn.textContent = original, 1500);
-    }catch{
-      alert("Couldn't copy automatically — select and copy the text manually.");
-    }
-  });
 </script>
 </body>
 </html>

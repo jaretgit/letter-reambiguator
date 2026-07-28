@@ -377,6 +377,36 @@
     flex-wrap:wrap;
   }
 
+  .continue-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    padding-top:24px;
+    margin-bottom:40px;
+    border-top:1px solid var(--line);
+  }
+  .continue-bar p{
+    font-size:13.5px;
+    color:var(--slate);
+    margin:0;
+    max-width:44ch;
+  }
+  .continue-link{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:var(--radius);
+    background:var(--gold);
+    color:var(--ink);
+    text-decoration:none;
+    white-space:nowrap;
+    flex:none;
+  }
+  .continue-link:hover{background:var(--gold-soft);}
+
   .footnote{
     font-size:12px;
     color:var(--slate);
@@ -421,6 +451,7 @@
         <div class="step-indicator">
           <a href="index.html" class="step" style="text-decoration:none;">1 · Write</a>
           <span class="step active">2 · Contacts</span>
+          <a href="review.html" class="step" style="text-decoration:none;">3 · Review</a>
         </div>
         <button type="button" id="restart-app" class="restart-btn">↺ Restart</button>
       </div>
@@ -479,19 +510,22 @@
       <span class="section-num">3</span>
       <h2>Your list</h2>
     </div>
-    <p class="section-sub">Everything you've added from steps 1 and 2, ready to take with you.</p>
+    <p class="section-sub">Everything you've added above. Copying happens on the review page, alongside your letter.</p>
 
     <div class="panel">
       <div id="my-list">
         <p class="list-empty">Nothing added yet — find your MLA or a minister above, then add them here.</p>
       </div>
       <div class="list-actions">
-        <button type="button" class="secondary small" id="copy-list">Copy emails</button>
-        <button type="button" class="secondary small" id="download-list">Download emails (.txt)</button>
         <button type="button" class="secondary small" id="clear-list">Clear list</button>
       </div>
     </div>
   </section>
+
+  <div class="continue-bar">
+    <p>Ready to send? Your letter and this contact list come together on the review page.</p>
+    <a href="review.html" class="continue-link">Review &amp; copy →</a>
+  </div>
 
   <p class="footnote">
     MLA matches come from the <a href="https://represent.opennorth.ca/" target="_blank" rel="noopener">Represent API</a> (Open North), which sources official electoral boundary and representative data — accuracy depends on their data refresh and, per their own documentation, postal codes occasionally straddle more than one district. Always confirm against <a href="https://www.elections.ab.ca/voters/members-of-the-legislative-assembly/" target="_blank" rel="noopener">Elections Alberta</a> for anything formal.
@@ -604,7 +638,28 @@
    ========================================================================= */
   let myList = []; // { type:'mla'|'minister', name, role, email, id }
 
+  function persistList(){
+    try{
+      sessionStorage.setItem('abContactList', JSON.stringify(myList));
+    }catch(err){
+      console.warn('Could not save contact list to sessionStorage:', err);
+    }
+  }
+
+  function loadPersistedList(){
+    try{
+      const raw = sessionStorage.getItem('abContactList');
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed)) myList = parsed;
+      }
+    }catch(err){
+      console.warn('Could not load saved contact list:', err);
+    }
+  }
+
   function renderList(){
+    persistList();
     const container = document.getElementById('my-list');
     if(myList.length === 0){
       container.innerHTML = '<p class="list-empty">Nothing added yet — find your MLA or a minister above, then add them here.</p>';
@@ -808,61 +863,6 @@
 /* =========================================================================
    LIST ACTIONS
    ========================================================================= */
-  function emailEntries(){
-    const withEmail = myList.filter(i=>i.email);
-    const withoutEmail = myList.filter(i=>!i.email);
-    return { withEmail, withoutEmail };
-  }
-
-  function listAsText(){
-    if(myList.length === 0) return '';
-    const { withEmail, withoutEmail } = emailEntries();
-    const lines = [];
-    withEmail.forEach(i=>lines.push(i.email));
-    if(withoutEmail.length){
-      lines.push("");
-      lines.push("No email on file (open their alberta.ca page from the list above):");
-      withoutEmail.forEach(i=>lines.push(`- ${i.name}`));
-    }
-    return lines.join("\n");
-  }
-
-  function emailsForClipboard(){
-    const { withEmail } = emailEntries();
-    return withEmail.map(i=>i.email).join(", ");
-  }
-
-  document.getElementById('copy-list').addEventListener('click', async ()=>{
-    if(myList.length === 0) return;
-    const { withEmail, withoutEmail } = emailEntries();
-    const text = emailsForClipboard();
-    if(!text){
-      alert("None of the items in your list have a known email address yet — see the alberta.ca links for those.");
-      return;
-    }
-    try{
-      await navigator.clipboard.writeText(text);
-      const btn = document.getElementById('copy-list');
-      const original = btn.textContent;
-      btn.textContent = withoutEmail.length ? `Copied ✓ (${withoutEmail.length} without email)` : "Copied ✓";
-      setTimeout(()=>btn.textContent = original, 2000);
-    }catch{
-      alert("Couldn't copy automatically — select and copy the list manually.");
-    }
-  });
-
-  document.getElementById('download-list').addEventListener('click', ()=>{
-    const text = listAsText();
-    if(!text) return;
-    const blob = new Blob([text], {type:'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'alberta-contact-list.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
   document.getElementById('clear-list').addEventListener('click', ()=>{
     if(myList.length === 0) return;
     if(confirm("Clear everything from your list?")){
@@ -887,6 +887,7 @@
     renderList();
   });
 
+  loadPersistedList();
   renderList();
 </script>
 </body>

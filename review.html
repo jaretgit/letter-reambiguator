@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review &amp; Copy — Alberta Constituent Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#17212B;
+    --ink-soft:#26333F;
+    --paper:#F3F0E7;
+    --paper-dim:#EAE5D6;
+    --gold:#B8862E;
+    --gold-soft:#D8B667;
+    --rust:#9C4A32;
+    --line:#D8D2C2;
+    --slate:#5B6472;
+    --white:#FFFFFF;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-soft);color:var(--ink);}
+
+  a{color:var(--rust);}
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--rust);
+    outline-offset:2px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    background:var(--ink);
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+    border-bottom:4px solid var(--gold);
+  }
+  .colonnade{
+    position:absolute;
+    inset:0;
+    opacity:0.16;
+    background-image:repeating-linear-gradient(
+      90deg,
+      transparent 0px, transparent 34px,
+      var(--gold-soft) 34px, var(--gold-soft) 36px
+    );
+    pointer-events:none;
+  }
+  .masthead-inner{
+    position:relative;
+    max-width:920px;
+    margin:0 auto;
+    padding:44px 24px 32px;
+  }
+  .masthead-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin:0;
+  }
+  .step-indicator{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--paper);
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .step-indicator .step{
+    padding:4px 9px;
+    border:1px solid #4A5563;
+    border-radius:2px;
+    color:#9099A6;
+  }
+  .step-indicator .step.active{
+    border-color:var(--gold-soft);
+    color:var(--gold-soft);
+  }
+  .restart-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    padding:7px 12px;
+    border:1px solid var(--gold-soft);
+    background:transparent;
+    color:var(--gold-soft);
+    border-radius:var(--radius);
+    cursor:pointer;
+    flex:none;
+  }
+  .restart-btn:hover{
+    background:var(--gold-soft);
+    color:var(--ink);
+  }
+  .masthead h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4.4vw,44px);
+    line-height:1.08;
+    margin:0 0 12px;
+    max-width:16ch;
+  }
+  .masthead p{
+    max-width:58ch;
+    color:#D9D2BF;
+    font-size:15.5px;
+    margin:0;
+  }
+
+  /* ---------- Layout ---------- */
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:36px 24px 80px;
+  }
+  section{margin-bottom:40px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+    margin-bottom:20px;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    border-radius:50%;
+    width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:20px;
+    margin:0;
+  }
+  .section-sub{
+    font-size:13.5px;
+    color:var(--slate);
+    margin:-12px 0 20px 34px;
+  }
+
+  .panel{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+
+  .empty-state{
+    font-size:14px;
+    color:var(--slate);
+  }
+  .empty-state a{font-weight:600;}
+
+  .letter-text{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    line-height:1.65;
+    white-space:pre-wrap;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin:0 0 16px;
+  }
+
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:var(--radius);
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button:hover{background:var(--ink-soft);}
+  button:active{transform:translateY(1px);}
+  button.secondary{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid #C7C0AC;
+    font-weight:500;
+  }
+  button.secondary:hover{background:var(--paper-dim);}
+  button.small{padding:7px 12px;font-size:12.5px;}
+
+  .actions-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .list-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .list-item:last-child{border-bottom:none;}
+  .list-item-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15.5px;
+    margin:0 0 2px;
+  }
+  .list-item-role{
+    font-size:12.5px;
+    color:var(--slate);
+    margin:0;
+  }
+  .list-item-email{
+    font-size:12.5px;
+    color:var(--rust);
+    margin:2px 0 0;
+  }
+  .no-email-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--slate);
+    border:1px solid var(--line);
+    padding:2px 6px;
+    border-radius:2px;
+  }
+  .missing-emails{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+    font-size:13px;
+    color:var(--slate);
+  }
+  .missing-emails ul{
+    margin:8px 0 0;
+    padding-left:20px;
+  }
+
+  .back-links{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .back-links a{font-weight:600;}
+
+  .footnote{
+    font-size:12px;
+    color:var(--slate);
+    border-top:1px solid var(--line);
+    margin-top:60px;
+    padding-top:18px;
+    max-width:70ch;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="colonnade" aria-hidden="true"></div>
+  <div class="masthead-inner">
+    <div class="masthead-top">
+      <p class="eyebrow">Constituent Briefing Tool — Alberta</p>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="step-indicator">
+          <a href="index.html" class="step" style="text-decoration:none;">1 · Write</a>
+          <a href="contacts.html" class="step" style="text-decoration:none;">2 · Contacts</a>
+          <span class="step active">3 · Review</span>
+        </div>
+        <button type="button" id="start-over" class="restart-btn">↺ Start over</button>
+      </div>
+    </div>
+    <h1>Everything, ready to send.</h1>
+    <p>Your letter and your contact list, together. Copy whichever you need.</p>
+  </div>
+</header>
+
+<main>
+
+  <section id="letter-section">
+    <div class="section-head">
+      <span class="section-num">1</span>
+      <h2>Your letter</h2>
+    </div>
+    <div class="panel" id="letter-panel">
+      <!-- populated by JS -->
+    </div>
+  </section>
+
+  <section id="contacts-section">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>Your contacts</h2>
+    </div>
+    <div class="panel" id="contacts-panel">
+      <!-- populated by JS -->
+    </div>
+  </section>
+
+  <div class="back-links">
+    <a href="index.html">← Back to letter</a>
+    <a href="contacts.html">← Back to contacts</a>
+  </div>
+
+  <p class="footnote">
+    Nothing on this page is stored anywhere but your browser's current session — closing the tab or hitting "Start over" clears it for good.
+  </p>
+
+</main>
+
+<script>
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  async function copyText(text, btn){
+    try{
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = "Copied ✓";
+      setTimeout(()=>btn.textContent = original, 1500);
+    }catch{
+      alert("Couldn't copy automatically — select and copy the text manually.");
+    }
+  }
+
+  /* ---------- Letter panel ---------- */
+  function renderLetterPanel(){
+    const panel = document.getElementById('letter-panel');
+    let letter = null;
+    try{
+      const raw = sessionStorage.getItem('abLetter');
+      if(raw) letter = JSON.parse(raw);
+    }catch(err){
+      console.warn('Could not read saved letter:', err);
+    }
+
+    if(!letter || !letter.text){
+      panel.innerHTML = `<p class="empty-state">No letter yet — <a href="index.html">go write one</a>.</p>`;
+      return;
+    }
+
+    panel.innerHTML = `
+      <p class="letter-text">${escapeHtml(letter.text)}</p>
+      <div class="actions-row">
+        <button type="button" class="secondary small" id="copy-letter">Copy letter</button>
+      </div>
+    `;
+    document.getElementById('copy-letter').addEventListener('click', (e)=>{
+      copyText(letter.text, e.currentTarget);
+    });
+  }
+
+  /* ---------- Contacts panel ---------- */
+  function loadContactList(){
+    try{
+      const raw = sessionStorage.getItem('abContactList');
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed)) return parsed;
+      }
+    }catch(err){
+      console.warn('Could not read saved contact list:', err);
+    }
+    return [];
+  }
+
+  function renderContactsPanel(){
+    const panel = document.getElementById('contacts-panel');
+    const list = loadContactList();
+
+    if(list.length === 0){
+      panel.innerHTML = `<p class="empty-state">No contacts yet — <a href="contacts.html">find your MLA and minister</a>.</p>`;
+      return;
+    }
+
+    const withEmail = list.filter(i=>i.email);
+    const withoutEmail = list.filter(i=>!i.email);
+
+    const itemsHtml = list.map(item=>`
+      <div class="list-item">
+        <div>
+          <p class="list-item-name">${escapeHtml(item.name)}</p>
+          <p class="list-item-role">${escapeHtml(item.role)}</p>
+          ${item.email ? `<p class="list-item-email">${escapeHtml(item.email)}</p>` : ''}
+        </div>
+        ${item.email ? '' : '<span class="no-email-tag">No email</span>'}
+      </div>
+    `).join('');
+
+    const missingHtml = withoutEmail.length ? `
+      <div class="missing-emails">
+        No email on file for these — use the alberta.ca link from the contacts page instead:
+        <ul>${withoutEmail.map(i=>`<li>${escapeHtml(i.name)}</li>`).join('')}</ul>
+      </div>
+    ` : '';
+
+    panel.innerHTML = `
+      ${itemsHtml}
+      <div class="actions-row" style="margin-top:18px;">
+        <button type="button" class="secondary small" id="copy-emails" ${withEmail.length ? '' : 'disabled'}>Copy emails</button>
+        <button type="button" class="secondary small" id="download-emails" ${withEmail.length ? '' : 'disabled'}>Download emails (.txt)</button>
+      </div>
+      ${missingHtml}
+    `;
+
+    if(withEmail.length){
+      document.getElementById('copy-emails').addEventListener('click', (e)=>{
+        copyText(withEmail.map(i=>i.email).join(", "), e.currentTarget);
+      });
+      document.getElementById('download-emails').addEventListener('click', ()=>{
+        const lines = withEmail.map(i=>i.email);
+        if(withoutEmail.length){
+          lines.push("", "No email on file:", ...withoutEmail.map(i=>`- ${i.name}`));
+        }
+        const blob = new Blob([lines.join("\n")], {type:'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'alberta-contact-list.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+  }
+
+  document.getElementById('start-over').addEventListener('click', ()=>{
+    if(confirm("Start over? This clears your letter and contact list.")){
+      sessionStorage.removeItem('abLetter');
+      sessionStorage.removeItem('abContactList');
+      window.location.href = 'index.html';
+    }
+  });
+
+  renderLetterPanel();
+  renderContactsPanel();
+</script>
+</body>
+</html>
